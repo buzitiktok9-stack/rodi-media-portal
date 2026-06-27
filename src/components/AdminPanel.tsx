@@ -44,6 +44,87 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Manual transaction delivery states
   const [manualDeliveryTexts, setManualDeliveryTexts] = useState<{ [txId: string]: string }>({});
 
+  const [activeAlerts, setActiveAlerts] = useState<{ id: string; message: string; type: "info" | "success" }[]>([]);
+
+  const playNotificationSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      
+      osc1.start(audioCtx.currentTime);
+      osc2.start(audioCtx.currentTime);
+      osc1.stop(audioCtx.currentTime + 0.5);
+      osc2.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+      console.error("Audio playback failed", e);
+    }
+  };
+
+  // Polling database for real-time notifications on the Admin Panel
+  useEffect(() => {
+    if (!isAuthenticated || !adminToken) return;
+
+    const intervalId = setInterval(() => {
+      fetch("/api/admin/db", {
+        headers: {
+          Authorization: adminToken
+        }
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Incorrect Password");
+          return res.json();
+        })
+        .then((newData) => {
+          setDb((prevDb) => {
+            if (!prevDb) return newData;
+
+            // Find new transactions
+            const newTxList = newData.transactions || [];
+            const oldTxList = prevDb.transactions || [];
+
+            const addedTx = newTxList.filter(
+              (newTx: any) => !oldTxList.some((oldTx: any) => oldTx.id === newTx.id)
+            );
+
+            if (addedTx.length > 0) {
+              // Play notification sound!
+              playNotificationSound();
+
+              // Add banner alerts
+              const newAlerts = addedTx.map((tx: any) => ({
+                id: `alert-${tx.id}-${Date.now()}`,
+                message: `📥 Reçu soumis : ${tx.productName} (${tx.amount.toLocaleString("fr-FR")} FCFA) par ${tx.email}`,
+                type: "info" as const
+              }));
+
+              setActiveAlerts((prevAlerts) => [...prevAlerts, ...newAlerts]);
+            }
+
+            return newData;
+          });
+        })
+        .catch((err) => {
+          console.error("Admin silent poll error:", err);
+        });
+    }, 8000); // Poll every 8 seconds
+
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, adminToken]);
+
   useEffect(() => {
     // Check local storage for pre-saved login
     const savedToken = localStorage.getItem("admin_token");
@@ -417,6 +498,29 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
           </button>
         </div>
       </div>
+
+      {/* Real-time Alerts Stack */}
+      {activeAlerts.length > 0 && (
+        <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 space-y-2 max-w-7xl mx-auto w-full mt-4 rounded-2xl">
+          {activeAlerts.map((alert) => (
+            <div
+              key={alert.id}
+              className="flex items-center justify-between bg-blue-50 border border-blue-200 text-blue-800 text-sm px-4 py-3 rounded-xl shadow-xs animate-slide-in font-medium"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-ping shrink-0" />
+                <span>{alert.message}</span>
+              </div>
+              <button
+                onClick={() => setActiveAlerts((prev) => prev.filter((a) => a.id !== alert.id))}
+                className="text-blue-500 hover:text-blue-800 p-1 rounded-md hover:bg-blue-100 transition-colors cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-4 sm:p-6 gap-6">
         {/* Navigation Sidebar */}

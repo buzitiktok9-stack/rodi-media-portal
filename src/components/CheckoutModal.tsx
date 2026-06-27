@@ -398,7 +398,7 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                     }`}
                   >
                     {receiptPreview ? (
-                      <div className="w-full flex flex-col items-center gap-2">
+                      <div key="preview" className="w-full flex flex-col items-center gap-2">
                         <img
                           src={receiptPreview}
                           alt="Receipt preview"
@@ -410,7 +410,7 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                         </span>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center">
+                      <div key="placeholder" className="flex flex-col items-center">
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mb-2.5">
                           <Upload className="w-5 h-5" />
                         </div>
