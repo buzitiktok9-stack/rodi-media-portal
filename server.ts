@@ -101,7 +101,8 @@ const storage = multer.diskStorage({
     cb(null, `receipt-${uniqueSuffix}${ext}`);
   }
 });
-const upload = multer({ storage });
+const multerInstance = typeof multer === "function" ? multer : ((multer as any).default || multer);
+const upload = multerInstance({ storage });
 
 // Initialize Gemini Client
 const getGeminiClient = (): GoogleGenAI | null => {
@@ -370,11 +371,13 @@ Réponds obligatoirement au format JSON pur suivant :
 }`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        imagePart,
-        promptText
-      ],
+      model: "gemini-3.5-flash",
+      contents: {
+        parts: [
+          imagePart,
+          { text: promptText }
+        ]
+      },
       config: {
         responseMimeType: "application/json"
       }
