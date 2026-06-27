@@ -397,30 +397,31 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                         : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    {/* Preview Block */}
-                    <div className={`w-full flex-col items-center gap-2 ${receiptPreview ? "flex" : "hidden"}`}>
-                      <img
-                        src={receiptPreview || ""}
-                        alt="Receipt preview"
-                        className="max-h-24 rounded-lg object-contain shadow-xs border border-slate-200"
-                      />
-                      <span className="text-xs font-medium text-emerald-700">
-                        {receiptFile?.name} (Modifier)
-                      </span>
-                    </div>
-
-                    {/* Placeholder Block */}
-                    <div className={`flex-col items-center ${receiptPreview ? "hidden" : "flex"}`}>
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mb-2.5">
-                        <Upload className="w-5 h-5" />
+                    {receiptPreview ? (
+                      <div className="w-full flex flex-col items-center gap-2">
+                        <img
+                          src={receiptPreview}
+                          alt="Receipt preview"
+                          className="max-h-24 rounded-lg object-contain shadow-xs border border-slate-200"
+                        />
+                        <span className="text-xs font-medium text-emerald-700 flex items-center gap-1 justify-center">
+                          <span>{receiptFile ? receiptFile.name : ""}</span>
+                          <span className="font-semibold text-emerald-800 underline">({String("Modifier")})</span>
+                        </span>
                       </div>
-                      <p className="text-sm font-semibold text-slate-700">
-                        Glissez-déposez le reçu ici
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        ou cliquez pour parcourir votre appareil
-                      </p>
-                    </div>
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mb-2.5">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-700">
+                          <span>Glissez-déposez le reçu ici</span>
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          <span>ou cliquez pour parcourir votre appareil</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -432,15 +433,15 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                 className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 font-semibold py-3.5 rounded-xl transition-all active:scale-98 shadow-md cursor-pointer disabled:cursor-not-allowed"
               >
                 {submitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-slate-400 border-t-white rounded-full animate-spin" />
-                    Enregistrement de la commande...
-                  </>
+                  <span className="flex items-center gap-2 justify-center">
+                    <span className="w-5 h-5 border-2 border-slate-400 border-t-white rounded-full animate-spin inline-block" />
+                    <span>Enregistrement de la commande...</span>
+                  </span>
                 ) : (
-                  <>
+                  <span className="flex items-center gap-2 justify-center">
                     <Send className="w-4.5 h-4.5" />
-                    Confirmer & Soumettre Reçu
-                  </>
+                    <span>Confirmer & Soumettre Reçu</span>
+                  </span>
                 )}
               </button>
             </form>
