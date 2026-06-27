@@ -448,7 +448,9 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   // CALC STATS
   const totalSalesCount = db.transactions.filter(t => t.status === "approved").length;
-  const pendingCount = db.transactions.filter(t => t.status === "pending").length;
+  const pendingCount = db.transactions.filter(
+    t => t.status === "pending" || (t.status === "approved" && t.isPendingManualDelivery)
+  ).length;
   const totalRevenue = db.transactions
     .filter(t => t.status === "approved")
     .reduce((sum, t) => sum + t.amount, 0);
@@ -1075,9 +1077,14 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
                           }`}>
                             {tx.status === "approved" ? "Validé" : tx.status === "rejected" ? "Refusé" : "En attente"}
                           </span>
-                          {tx.isPendingManualDelivery && (
+                          {tx.isPendingManualDelivery && tx.status === "approved" && (
                             <span className="bg-rose-600 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full animate-pulse uppercase">
                               Stock Vide - Urgent !
+                            </span>
+                          )}
+                          {tx.isPendingManualDelivery && tx.status === "pending" && (
+                            <span className="bg-amber-600 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full animate-pulse uppercase">
+                              Validation Manuelle Requise !
                             </span>
                           )}
                         </div>
