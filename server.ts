@@ -337,6 +337,13 @@ app.post("/api/checkout", upload.single("receipt"), async (req, res) => {
       return;
     }
 
+    // Vérification du genre/type de fichier (mimetype) côté serveur
+    if (!file.mimetype.startsWith("image/")) {
+      await fs.unlink(file.path).catch(() => {});
+      res.status(400).json({ error: "Veuillez sélectionner uniquement une image (PNG, JPG ou JPEG)." });
+      return;
+    }
+
     const db = await loadDb();
     const product = db.products.find(p => p.id === productId);
     const country = db.countries.find(c => c.code === countryCode);
