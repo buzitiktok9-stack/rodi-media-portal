@@ -383,12 +383,12 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                     className="hidden"
                   />
 
-                  <label
-                    htmlFor="receiptInput"
+                  <div
                     onDragEnter={handleDrag}
                     onDragOver={handleDrag}
                     onDragLeave={handleDrag}
                     onDrop={handleDrop}
+                    onClick={() => document.getElementById("receiptInput")?.click()}
                     className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[140px] ${
                       dragActive
                         ? "border-slate-900 bg-slate-50"
@@ -421,7 +421,7 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                         ou cliquez pour parcourir votre appareil
                       </p>
                     </div>
-                  </label>
+                  </div>
                 </div>
               </div>
 
