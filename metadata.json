@@ -1,0 +1,6 @@
+{
+  "name": "Portail de Vente Sécurisé",
+  "description": "Un site de vente professionnel et responsive avec vérification automatisée des transactions et livraison instantanée.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

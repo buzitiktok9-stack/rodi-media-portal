@@ -1,0 +1,205 @@
+{
+  "products": [
+    {
+      "id": "prod-1",
+      "name": "Netflix Premium Ultra HD - 1 Mois",
+      "price": 5000,
+      "description": "Compte Netflix Premium 4K, 1 Écran Privé. Profil verrouillé par code PIN. Garantie de remplacement de 30 jours.",
+      "category": "Abonnements",
+      "image": "https://images.unsplash.com/photo-1574375927938-d5a98e8edd86?auto=format&fit=crop&w=600&q=80",
+      "stock": [
+        "Email: netflix.premium.user1@gmail.com | MDP: NetFlix2026! | Profil: Écran 2 | PIN: 4892",
+        "Email: netflix.premium.user2@gmail.com | MDP: PlayNetflix99$ | Profil: Écran 4 | PIN: 1105",
+        "Email: netflix.premium.user3@gmail.com | MDP: MoviesRodi33# | Profil: Écran 1 | PIN: 7780"
+      ]
+    },
+    {
+      "id": "prod-2",
+      "name": "Canal+ Tout Canal - 1 Mois",
+      "price": 10000,
+      "description": "Formule Tout Canal+ (Bouquet Complet) sur l'application myCanal ou décodeur. Accès à tous les championnats et films.",
+      "category": "Abonnements",
+      "image": "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=600&q=80",
+      "stock": [
+        "Abonnement activé sur Compte: canal.user.test1@gmail.com | MDP: CanalSuper2026",
+        "Abonnement activé sur Compte: canal.user.test2@gmail.com | MDP: CanalRodi1010!"
+      ]
+    },
+    {
+      "id": "prod-3",
+      "name": "Spotify Premium - 1 Mois",
+      "price": 2000,
+      "description": "Abonnement Spotify Premium personnel (invitation Famille ou Compte Dédié). Musique illimitée sans publicité et hors ligne.",
+      "category": "Musique",
+      "image": "https://images.unsplash.com/photo-1614680376593-902f74fa0d41?auto=format&fit=crop&w=600&q=80",
+      "stock": [
+        "Lien d'invitation Famille Spotify Premium: https://spoti.fi/example-invite-token-1234",
+        "Lien d'invitation Famille Spotify Premium: https://spoti.fi/example-invite-token-5678"
+      ]
+    },
+    {
+      "id": "prod-4",
+      "name": "Free Fire 1000 Diamants",
+      "price": 4000,
+      "description": "Recharge directe de 1000 diamants sur votre ID de joueur Free Fire. Déclenchement automatique.",
+      "category": "Jeux",
+      "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
+      "stock": [
+        "Code de recharge Garena Free Fire: FF-DIAM-9382-KSLD-8821",
+        "Code de recharge Garena Free Fire: FF-DIAM-1120-POJS-9038"
+      ]
+    },
+    {
+      "id": "prod-5",
+      "name": "IPTV Premium Gold - 12 Mois",
+      "price": 15000,
+      "description": "Plus de 15 000 chaînes internationales en HD/FHD, films et séries récents (VOD). Compatible Smart TV, Box Android, FireStick, Smartphone.",
+      "category": "IPTV",
+      "image": "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=600&q=80",
+      "stock": []
+    }
+  ],
+  "countries": [
+    {
+      "code": "BF",
+      "name": "Burkina Faso",
+      "paymentMethods": [
+        {
+          "id": "bf-orange",
+          "name": "Orange Money",
+          "logo": "orange",
+          "number": "+226 76 12 34 56",
+          "holder": "Rodi A2Di",
+          "instructions": "Veuillez effectuer un transfert d'argent direct de la valeur exacte du produit au numéro indiqué. (Exemple: *144*4*1*[Montant]*76123456#)"
+        },
+        {
+          "id": "bf-moov",
+          "name": "Moov Money (Flooz)",
+          "logo": "moov",
+          "number": "+226 60 98 76 54",
+          "holder": "Rodi A2Di",
+          "instructions": "Veuillez effectuer un transfert direct Moov Money au numéro indiqué. (Exemple: *555*2*1*[Montant]*60987654#)"
+        },
+        {
+          "id": "bf-wave",
+          "name": "Wave",
+          "logo": "wave",
+          "number": "+226 55 11 22 33",
+          "holder": "A2Di Distribution",
+          "instructions": "Envoyez le montant exact sans frais via l'application Wave sur le numéro indiqué."
+        }
+      ]
+    },
+    {
+      "code": "CI",
+      "name": "Côte d'Ivoire",
+      "paymentMethods": [
+        {
+          "id": "ci-orange",
+          "name": "Orange Money CI",
+          "logo": "orange",
+          "number": "+225 07 45 67 89 01",
+          "holder": "Rodi Services CI",
+          "instructions": "Faites un transfert classique via Orange Money sur ce numéro."
+        },
+        {
+          "id": "ci-mtn",
+          "name": "MTN Mobile Money CI",
+          "logo": "mtn",
+          "number": "+225 05 98 76 54 32",
+          "holder": "Rodi Services CI",
+          "instructions": "Faites le transfert d'argent via MTN MoMo au numéro indiqué."
+        },
+        {
+          "id": "ci-wave",
+          "name": "Wave CI",
+          "logo": "wave",
+          "number": "+225 01 12 23 34 45",
+          "holder": "A2Di Services CI",
+          "instructions": "Utilisez l'application Wave pour effectuer le transfert sans frais de transaction."
+        }
+      ]
+    },
+    {
+      "code": "SN",
+      "name": "Sénégal",
+      "paymentMethods": [
+        {
+          "id": "sn-orange",
+          "name": "Orange Money Sénégal",
+          "logo": "orange",
+          "number": "+221 77 112 23 34",
+          "holder": "Rodi Distribution SN",
+          "instructions": "Effectuez le transfert d'argent via Orange Money au numéro indiqué."
+        },
+        {
+          "id": "sn-wave",
+          "name": "Wave Sénégal",
+          "logo": "wave",
+          "number": "+221 76 445 56 67",
+          "holder": "Rodi Distribution SN",
+          "instructions": "Envoyez le montant sans frais via l'application Wave au numéro indiqué."
+        }
+      ]
+    },
+    {
+      "code": "ML",
+      "name": "Mali",
+      "paymentMethods": [
+        {
+          "id": "ml-orange",
+          "name": "Orange Money Mali",
+          "logo": "orange",
+          "number": "+223 70 12 34 56",
+          "holder": "Rodi ML",
+          "instructions": "Effectuez un transfert direct via Orange Money au numéro indiqué."
+        },
+        {
+          "id": "ml-moov",
+          "name": "Moov Money Mali",
+          "logo": "moov",
+          "number": "+223 60 98 76 54",
+          "holder": "Rodi ML",
+          "instructions": "Effectuez un transfert via Moov Money au numéro indiqué."
+        }
+      ]
+    },
+    {
+      "code": "GL",
+      "name": "International / Crypto",
+      "paymentMethods": [
+        {
+          "id": "crypto-payeer",
+          "name": "Payeer USD/EUR",
+          "logo": "payeer",
+          "number": "P10928374",
+          "holder": "Rodi Global Account",
+          "instructions": "Envoyez le montant équivalent en USD/EUR sur ce numéro de compte Payeer."
+        },
+        {
+          "id": "crypto-pm",
+          "name": "Perfect Money",
+          "logo": "perfect_money",
+          "number": "U39284711",
+          "holder": "Rodi Global PM",
+          "instructions": "Envoyez le montant exact en USD sur notre compte Perfect Money."
+        }
+      ]
+    }
+  ],
+  "transactions": [],
+  "subscribers": [],
+  "config": {
+    "adminPassword": "admin",
+    "telegramBotToken": "",
+    "telegramChatId": "",
+    "supportTelegram": "@rodiA2Di",
+    "smtpConfig": {
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "user": "",
+      "pass": "",
+      "from": "noreply@rodimedia.com"
+    }
+  }
+}
