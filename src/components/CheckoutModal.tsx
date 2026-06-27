@@ -374,6 +374,15 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                     Photo du Reçu de Transaction <span className="text-rose-500">*</span>
                   </label>
 
+                  <input
+                    id="receiptInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={submitting}
+                    className="hidden"
+                  />
+
                   <div
                     onDragEnter={handleDrag}
                     onDragOver={handleDrag}
@@ -388,40 +397,30 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                         : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    <input
-                      id="receiptInput"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      onClick={(e) => e.stopPropagation()}
-                      disabled={submitting}
-                      className="hidden"
-                    />
+                    {/* Preview Block */}
+                    <div className={`w-full flex-col items-center gap-2 ${receiptPreview ? "flex" : "hidden"}`}>
+                      <img
+                        src={receiptPreview || ""}
+                        alt="Receipt preview"
+                        className="max-h-24 rounded-lg object-contain shadow-xs border border-slate-200"
+                      />
+                      <span className="text-xs font-medium text-emerald-700">
+                        {receiptFile?.name} (Modifier)
+                      </span>
+                    </div>
 
-                    {receiptPreview ? (
-                      <div className="w-full flex flex-col items-center gap-2">
-                        <img
-                          src={receiptPreview}
-                          alt="Receipt preview"
-                          className="max-h-24 rounded-lg object-contain shadow-xs border border-slate-200"
-                        />
-                        <span className="text-xs font-medium text-emerald-700">
-                          {receiptFile?.name} (Modifier)
-                        </span>
+                    {/* Placeholder Block */}
+                    <div className={`flex-col items-center ${receiptPreview ? "hidden" : "flex"}`}>
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mb-2.5">
+                        <Upload className="w-5 h-5" />
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mb-2.5">
-                          <Upload className="w-5 h-5" />
-                        </div>
-                        <p className="text-sm font-semibold text-slate-700">
-                          Glissez-déposez le reçu ici
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          ou cliquez pour parcourir votre appareil
-                        </p>
-                      </div>
-                    )}
+                      <p className="text-sm font-semibold text-slate-700">
+                        Glissez-déposez le reçu ici
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        ou cliquez pour parcourir votre appareil
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
