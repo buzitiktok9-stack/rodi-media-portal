@@ -393,6 +393,7 @@ export default function CheckoutModal({ product, onClose, onCheckoutSuccess }: C
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
+                      onClick={(e) => e.stopPropagation()}
                       disabled={submitting}
                       className="hidden"
                     />
