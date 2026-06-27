@@ -5,6 +5,7 @@ import { existsSync } from "fs";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 import { createServer as createViteServer } from "vite";
 import { DatabaseSchema, Product, Transaction, Subscriber, AppConfig, Country } from "./src/types.js";
 
@@ -63,6 +64,122 @@ async function loadDb(): Promise<DatabaseSchema> {
 // Save database
 async function saveDb(db: DatabaseSchema): Promise<void> {
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
+}
+
+// Email sender helper
+async function sendEmail(to: string, subject: string, html: string, config: AppConfig) {
+  const smtp = config.smtpConfig;
+  if (!smtp || !smtp.host || !smtp.user || !smtp.pass) {
+    console.log(`[Email Simulator] No SMTP configured. Would have sent email to ${to}: "${subject}"`);
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: smtp.host,
+      port: smtp.port || 587,
+      secure: smtp.port === 465, // true for 465, false for other ports
+      auth: {
+        user: smtp.user,
+        pass: smtp.pass,
+      },
+    });
+
+    const mailOptions = {
+      from: `"${config.supportTelegram ? 'Rodi Support (' + config.supportTelegram + ')' : 'Rodi Media'}" <${smtp.from || smtp.user}>`,
+      to,
+      subject,
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Email sent successfully to ${to}: ${info.messageId}`);
+  } catch (err) {
+    console.error(`Error sending email to ${to}:`, err);
+  }
+}
+
+// Transaction approved email template and sender
+async function sendTransactionApprovedEmail(tx: Transaction, config: AppConfig) {
+  if (!tx.email) return;
+
+  const isPendingDelivery = !tx.deliveredItem;
+  const subject = isPendingDelivery 
+    ? `Confirmation de votre commande - ${tx.productName} (En cours de livraison)`
+    : `🎉 Vos accès pour ${tx.productName} sont prêts !`;
+
+  const deliveryHtml = tx.deliveredItem 
+    ? `<div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 12px; margin: 20px 0; color: #166534;">
+         <h3 style="margin-top: 0; color: #14532d; font-size: 16px; font-weight: 600;">Vos accès / codes :</h3>
+         <pre style="font-family: monospace; background-color: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; white-space: pre-wrap; word-break: break-all; margin: 0;">${tx.deliveredItem}</pre>
+       </div>`
+    : `<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; color: #78350f; font-weight: 500; border-radius: 8px; margin: 20px 0;">
+         Le paiement a été validé ! Notre stock automatique est temporairement épuisé pour ce produit. Un administrateur est en cours de réapprovisionnement et vous livrera manuellement par e-mail ou WhatsApp très rapidement.
+       </div>`;
+
+  const emailHtml = `
+    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #0f172a; font-size: 22px; font-weight: 700; margin: 0;">Rodi Media Portal</h1>
+      </div>
+      
+      <p style="font-size: 15px; line-height: 1.5;">Bonjour,</p>
+      <p style="font-size: 15px; line-height: 1.5;">Nous avons le plaisir de vous informer que votre paiement de <strong>${tx.amount} FCFA</strong> pour <strong>${tx.productName}</strong> a été validé avec succès.</p>
+      
+      ${deliveryHtml}
+
+      <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; padding: 16px; border-radius: 12px; margin: 20px 0; font-size: 13px; color: #475569;">
+        <strong>Détails de la commande :</strong>
+        <div style="margin-top: 8px;">• ID Commande : <code>${tx.id}</code></div>
+        <div>• Produit : ${tx.productName}</div>
+        <div>• Date : ${new Date(tx.createdAt).toLocaleString('fr-FR')}</div>
+      </div>
+
+      <p style="font-size: 15px; line-height: 1.5;">Si vous avez besoin d'aide ou si vous rencontrez le moindre problème, vous pouvez contacter notre support sur Telegram : <strong>${config.supportTelegram || "@rodiA2Di"}</strong>.</p>
+      
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #64748b; text-align: center; margin: 0;">Merci pour votre confiance !<br />L'équipe Rodi Media</p>
+    </div>
+  `;
+
+  await sendEmail(tx.email, subject, emailHtml, config);
+}
+
+// Transaction rejected email template and sender
+async function sendTransactionRejectedEmail(tx: Transaction, reason: string, config: AppConfig) {
+  if (!tx.email) return;
+
+  const subject = `❌ Problème de validation pour votre commande - ${tx.productName}`;
+
+  const emailHtml = `
+    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #0f172a; font-size: 22px; font-weight: 700; margin: 0;">Rodi Media Portal</h1>
+      </div>
+      
+      <p style="font-size: 15px; line-height: 1.5;">Bonjour,</p>
+      <p style="font-size: 15px; line-height: 1.5;">Nous avons analysé le reçu de paiement envoyé pour votre commande de <strong>${tx.productName}</strong> (Référence : <code>${tx.id}</code>).</p>
+      
+      <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; border-radius: 8px; margin: 20px 0; color: #991b1b; font-size: 14px;">
+        <strong style="display: block; margin-bottom: 6px;">Motif du rejet :</strong>
+        ${reason || "Le reçu de paiement fourni n'a pas pu être validé."}
+      </div>
+
+      <p style="font-size: 15px; line-height: 1.5;"><strong>Que faire maintenant ?</strong></p>
+      <ul style="font-size: 14px; line-height: 1.6; color: #334155; padding-left: 20px;">
+        <li>Veuillez vous assurer de fournir la capture d'écran complète et lisible du reçu officiel de l'opérateur (Orange Money, Wave, Moov, MTN, etc.).</li>
+        <li>Vérifiez que le montant envoyé correspond exactement au montant du produit (${tx.amount} FCFA).</li>
+        <li>Vous pouvez soumettre une nouvelle commande sur notre site avec le reçu correct.</li>
+      </ul>
+
+      <p style="font-size: 15px; line-height: 1.5;">Si vous estimez qu'il s'agit d'une erreur ou si vous avez besoin d'aide pour valider votre commande, veuillez contacter immédiatement notre support sur Telegram : <strong>${config.supportTelegram || "@rodiA2Di"}</strong>.</p>
+      
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #64748b; text-align: center; margin: 0;">L'équipe Rodi Media</p>
+    </div>
+  `;
+
+  await sendEmail(tx.email, subject, emailHtml, config);
 }
 
 // Telegram messenger helper
@@ -409,6 +526,17 @@ Réponds obligatoirement au format JSON pur suivant :
         `<b>Action:</b> Le client a été notifié de l'échec de la transaction.`,
         db.config
       );
+
+      // Send rejection email to client
+      try {
+        const freshDb = await loadDb();
+        const updatedTx = freshDb.transactions.find(t => t.id === transactionId);
+        if (updatedTx) {
+          await sendTransactionRejectedEmail(updatedTx, verificationResult.reason, db.config);
+        }
+      } catch (emailErr) {
+        console.error("Error initiating rejection email:", emailErr);
+      }
     }
 
   } catch (err) {
@@ -475,6 +603,17 @@ async function processSuccessfulPayment(transactionId: string, product: Product,
       `<b>Félicitations !</b> Le robot a vérifié le reçu et a livré le produit instantanément.`,
       globalConfigDb.config
     );
+  }
+
+  // Send purchase email to client
+  try {
+    const freshDb = await loadDb();
+    const updatedTx = freshDb.transactions.find(t => t.id === transactionId);
+    if (updatedTx) {
+      await sendTransactionApprovedEmail(updatedTx, globalConfigDb.config);
+    }
+  } catch (emailErr) {
+    console.error("Error initiating approval email:", emailErr);
   }
 }
 
@@ -653,6 +792,17 @@ app.post("/api/admin/transactions/:id/action", adminAuth, async (req, res) => {
         db.config
       );
 
+      // Send email notification to client
+      try {
+        const freshDb = await loadDb();
+        const updatedTx = freshDb.transactions.find(t => t.id === id);
+        if (updatedTx) {
+          await sendTransactionApprovedEmail(updatedTx, db.config);
+        }
+      } catch (emailErr) {
+        console.error("Error initiating manual approval email:", emailErr);
+      }
+
       res.json({ success: true, message: "Transaction approuvée avec succès !" });
 
     } else if (action === "reject") {
@@ -665,6 +815,18 @@ app.post("/api/admin/transactions/:id/action", adminAuth, async (req, res) => {
         `<b>Par:</b> Admin`,
         db.config
       );
+
+      // Send email notification to client
+      try {
+        const freshDb = await loadDb();
+        const updatedTx = freshDb.transactions.find(t => t.id === id);
+        if (updatedTx) {
+          await sendTransactionRejectedEmail(updatedTx, "Rejeté manuellement par l'administrateur.", db.config);
+        }
+      } catch (emailErr) {
+        console.error("Error initiating manual rejection email:", emailErr);
+      }
+
       res.json({ success: true, message: "Transaction rejetée avec succès !" });
     } else {
       res.status(400).json({ error: "Action invalide." });
