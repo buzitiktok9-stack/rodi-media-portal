@@ -333,10 +333,21 @@ async function runBackgroundVerification(
     const fileBuffer = await fs.readFile(filePath);
     const base64Data = fileBuffer.toString("base64");
 
+    // Dynamically check mimeType based on extension
+    let mimeType = "image/png";
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === ".jpg" || ext === ".jpeg") {
+      mimeType = "image/jpeg";
+    } else if (ext === ".webp") {
+      mimeType = "image/webp";
+    } else if (ext === ".gif") {
+      mimeType = "image/gif";
+    }
+
     const imagePart = {
       inlineData: {
         data: base64Data,
-        mimeType: "image/png" // Multer uploaded screenshot
+        mimeType: mimeType
       }
     };
 
@@ -360,7 +371,12 @@ Réponds obligatoirement au format JSON pur suivant :
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
-      contents: [imagePart, { text: promptText }],
+      contents: {
+        parts: [
+          imagePart,
+          { text: promptText }
+        ]
+      },
       config: {
         responseMimeType: "application/json"
       }

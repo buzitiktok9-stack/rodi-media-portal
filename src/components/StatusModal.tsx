@@ -89,11 +89,11 @@ export default function StatusModal({ transactionId, onClose }: StatusModalProps
     <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden p-8 flex flex-col items-center text-center border border-slate-100">
         
-        {/* PENDING / PROCESSING STATE */}
-        {status === "pending" && (
+        {/* PENDING / PROCESSING STATE - AUTOMATIC ROBOT */}
+        {status === "pending" && !isPendingManualDelivery && (
           <div className="py-8 space-y-6">
             {/* Spinning Loader Ring */}
-            <div className="relative flex items-center justify-center w-24 h-24">
+            <div className="relative flex items-center justify-center w-24 h-24 mx-auto">
               <div className="absolute w-20 h-20 border-4 border-slate-100 rounded-full" />
               <div className="absolute w-20 h-20 border-4 border-slate-900 border-t-transparent rounded-full animate-spin" />
               <Clock className="w-8 h-8 text-slate-800 animate-pulse" />
@@ -119,6 +119,45 @@ export default function StatusModal({ transactionId, onClose }: StatusModalProps
                 Légère latence réseau détectée, reconnexion automatique en cours...
               </p>
             )}
+          </div>
+        )}
+
+        {/* PENDING / PROCESSING STATE - MANUAL TEAM TAKE OVER */}
+        {status === "pending" && isPendingManualDelivery && (
+          <div className="py-6 space-y-6 w-full flex flex-col items-center">
+            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-1 animate-pulse">
+              <Clock className="w-9 h-9 animate-spin" style={{ animationDuration: '4s' }} />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-slate-950">Vérification Manuelle</h3>
+              <p className="text-sm font-semibold text-blue-800">
+                Un agent vérifie votre reçu actuellement
+              </p>
+            </div>
+
+            <p className="text-sm text-slate-500 leading-relaxed text-left bg-slate-50 p-4.5 rounded-2xl border border-slate-100 font-medium">
+              Votre reçu de paiement a bien été enregistré. 
+              <br /><br />
+              Comme le robot automatique prend un peu plus de temps ou est indisponible, <strong>un de nos agents du support technique prend le relais immédiatement pour valider votre transaction</strong>.
+              <br /><br />
+              Veuillez <span className="underline font-bold text-slate-900">laisser cette page ouverte</span>. Dès que l'agent valide votre paiement depuis son panneau d'administration, votre produit s'affichera instantanément ici.
+            </p>
+
+            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-400 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              Notification envoyée aux administrateurs...
+            </div>
+
+            <a
+              href="https://t.me/rodiA2Di"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-3.5 rounded-xl transition-all cursor-pointer shadow-md"
+            >
+              <MessageCircle className="w-4.5 h-4.5" />
+              Contacter le support Telegram
+            </a>
           </div>
         )}
 
